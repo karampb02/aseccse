@@ -34,15 +34,13 @@
       font-size: 18px;
       font-weight: bold;
       color: white;
-      background-color: #3498db;
       border: none;
       border-radius: 8px;
-      text-decoration: none;
       cursor: pointer;
       transition: background-color 0.3s ease, transform 0.2s ease;
+      -webkit-appearance: none; /* Removes default button styles on iOS */
     }
     .button:hover {
-      background-color: #2980b9;
       transform: translateY(-2px);
     }
     .button-a {
@@ -64,10 +62,41 @@
 <div class="container">
   <h2>Which attendance sheet would you like to open?</h2>
   <div>
-    <a href="index_Version4.html" class="button button-a">Section A</a>
-    <a href="index_Version5.html" class="button button-b">Section B</a>
+    <button onclick="checkPassword('A')" class="button button-a">Section A</button>
+    <button onclick="checkPassword('B')" class="button button-b">Section B</button>
   </div>
 </div>
+
+<script>
+  function checkPassword(section) {
+    // Prompt the user for a password
+    const userInput = prompt(`Please enter the password for Section ${section}:`);
+
+    // Do nothing if the user clicks "Cancel"
+    if (userInput === null) {
+      return;
+    }
+
+    // Check which section was selected and validate the password
+    if (section === 'A') {
+      if (userInput === '@Asec') {
+        // Correct password for Section A, redirect
+        window.location.href = 'index_Version4.html';
+      } else {
+        // Incorrect password
+        alert('Incorrect password. Please try again.');
+      }
+    } else if (section === 'B') {
+      if (userInput === '@Bsec') {
+        // Correct password for Section B, redirect
+        window.location.href = 'index_Version5.html';
+      } else {
+        // Incorrect password
+        alert('Incorrect password. Please try again.');
+      }
+    }
+  }
+</script>
 
 </body>
 </html>
