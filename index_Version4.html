@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>College Attendance Tracker</title>
+  <title>College Attendance Tracker - Section A</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     table { border-collapse: collapse; width: 100%; }
@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<h2>Attendance</h2>
+<h2>Attendance - Section A</h2>
 <p id="date">Date:</p>
 <p>Enter Subject Name: <input id="subject"/></p>
 <table id="attendanceTable">
@@ -23,8 +23,7 @@
   </tr>
 </table>
 
-<button onclick="exportTXT()">Export as TXT</button>
-<button onclick="exportPDF()">Export as PDF</button>
+<button onclick="promptForPDFExport()">Export as PDF</button>
 <button onclick="resetAttendance()">Reset</button>
 
 <div style="position:fixed; bottom:0; right:0; opacity: 0.5; text-align:right">Created by: Karamjit Singh<br>Avnoor Singh Bal</div>
@@ -32,164 +31,40 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-  // Only names, no IDs
+  // Students for Section A
   const studentsRaw = [
-    "AARUSHI SETHI",
-    "ABHAY SINGH",
-    "ABHI VERMA",
-    "AKARSHDEEP SINGH",
-    "AKASHDEEP SINGH",
-    "AMANAT SHARMA",
-    "AMANDEEP KAUR",
-    "AMRIK SINGH",
-    "ANANYA SINGLA",
-    "ANGEL GUPTA",
-    "ANIKET",
-    "ANKIT KUMAR",
-    "ANMOLDEEP KAUR",
-    "ANMOLPREET KAUR",
-    "ANSH AHLAWAT",
-    "ANUSHKA",
-    "ARCHIE DHIR",
-    "ARIHANT SHARMA",
-    "ARMAAN DEORA",
-    "ARMAANDEEP SINGH",
-    "ARNAV CHANDEL",
-    "ARSHDEEP SINGH",
-    "ARSHDEEP SINGH",
-    "ARYAN RAJ",
-    "ARYANSH",
-    "ASHIMA",
-    "ATHARV KAUL",
-    "AVNOOR SINGH BAL",
-    "AVZ SHARMA",
-    "AYUSH RAJ",
-    "BALGOPAL RAI SINGH",
-    "BARINDERPAL SINGH",
-    "BISHAV HANS",
-    "BHAKTI GUPTA",
-    "BHAUMIK",
-    "BHAVYA",
-    "BHAVYA SHARMA",
-    "BIRJOT KAUR",
-    "CHAHAT",
-    "CHAKSHIKA CHAWLA",
-    "CHARU MALHOTRA",
-    "CHAUDHARY ASHUTOSH KUMAR",
-    "DEEPALI LUTHRA",
-    "DEEPIKA",
-    "DEVAM SAGGU",
-    "DEVANG",
-    "DHRUV PATHANIA",
-    "DHRUV SHARMA",
-    "DILJOT KAUR",
-    "DIVYA",
-    "DINKAR MITTAL",
-    "DIPTI",
-    "DIVJOT SINGH",
-    "DIVJOT SINGH",
-    "DIVYANSH",
-    "GARIMA TRIKHA",
-    "GARV SEHGAL",
-    "GOUTAM KUMAR",
-    "GURANGAD SINGH",
-    "GURANSHPREET SINGH",
-    "GURJASHAN SINGH",
-    "GURMANNAT KAUR",
-    "GURMEET SINGH",
-    "GURNOOR KAUR",
-    "GURNOOR SINGH",
-    "GURNOOR SINGH",
-    "GURPREET KAUR",
-    "GURSAJ SINGH",
-    "GURSEERAT KAUR",
-    "GURSHAN SINGH",
-    "GURSHAN SINGH",
-    "GURSIMRAN SINGH",
-    "HAETAL KATARIA",
-    "HARANSH SINGH",
-    "HARGUN DEEP SINGH",
-    "HARJAP SINGH",
-    "HARKIRAT SINGH RIAR",
-    "HARMANJOT SINGH",
-    "HARNEET KAUR",
-    "HARNOOR KAUR",
-    "HARSHIL GUPTA",
-    "HARSHIL GUPTA",
-    "HARSHIT MALHOTRA",
-    "HARSHIT MOHAN SHARMA",
-    "HARSHPREET KAUR",
-    "HARSIDAK SINGH",
-    "HARWINDER SINGH",
-    "ISHAN SEHGAL",
-    "ISHITA",
-    "ISHMEET KAUR",
-    "ISHMEET SINGH",
-    "JAGJIT SINGH",
-    "JAGWINDER SINGH",
-    "JAHIRUL ISLAM JOY",
-    "JAHNAVI",
-    "JAHNVI UCHARIA",
-    "JASDEEP KAUR",
-    "JASHANPREET SINGH",
-    "JASKARANJEET SINGH",
-    "JASKIRAT KAUR",
-    "JASLEEN KAUR",
-    "JASMIN KAUR SANDHU",
-    "JASMINE KAUR",
-    "JASPREET KAUR",
-    "JATIN BERI",
-    "JITISH MONGA",
-    "KARAMJIT SINGH",
-    "KARAN SINGH",
-    "KARSIMRAN SINGH",
-    "KASHIKA",
-    "KAVYA ARORA",
-    "KESHAV PURI",
-    "KHUSHAAN LAL",
-    "KHUSHI MEHTA",
-    "KHUSHPREET SINGH",
-    "KIRT PAUL",
-    "KOMALPREET KAUR",
-    "KRISH BHAGAT",
-    "KRISH GUMBER",
-    "KRISH KUMAR",
-    "KRISH NAYYAR",
-    "KRISHAN CHOPRA",
-    "KRISHI SONDHI",
-    "KRISHNA",
-    "KRITAGAYA BHATIA",
-    "KRITIKA MEHTA",
-    "KUNAL",
-    "KUSHAGRAH JAIN"
+    "AARUSHI SETHI", "ABHAY SINGH", "ABHI VERMA", "AKARSHDEEP SINGH", "AKASHDEEP SINGH", "AMANAT SHARMA",
+    "AMANDEEP KAUR", "AMRIK SINGH", "ANANYA SINGLA", "ANGEL GUPTA", "ANIKET", "ANKIT KUMAR",
+    "ANMOLDEEP KAUR", "ANMOLPREET KAUR", "ANSH AHLAWAT", "ANUSHKA", "ARCHIE DHIR", "ARIHANT SHARMA",
+    "ARMAAN DEORA", "ARMAANDEEP SINGH", "ARNAV CHANDEL", "ARSHDEEP SINGH", "ARSHDEEP SINGH", "ARYAN RAJ",
+    "ARYANSH", "ASHIMA", "ATHARV KAUL", "AVNOOR SINGH BAL", "AVZ SHARMA", "AYUSH RAJ", "BALGOPAL RAI SINGH",
+    "BARINDERPAL SINGH", "BISHAV HANS", "BHAKTI GUPTA", "BHAUMIK", "BHAVYA", "BHAVYA SHARMA", "BIRJOT KAUR",
+    "CHAHAT", "CHAKSHIKA CHAWLA", "CHARU MALHOTRA", "CHAUDHARY ASHUTOSH KUMAR", "DEEPALI LUTHRA", "DEEPIKA",
+    "DEVAM SAGGU", "DEVANG", "DHRUV PATHANIA", "DHRUV SHARMA", "DILJOT KAUR", "DIVYA", "DINKAR MITTAL",
+    "DIPTI", "DIVJOT SINGH", "DIVJOT SINGH", "DIVYANSH", "GARIMA TRIKHA", "GARV SEHGAL", "GOUTAM KUMAR",
+    "GURANGAD SINGH", "GURANSHPREET SINGH", "GURJASHAN SINGH", "GURMANNAT KAUR", "GURMEET SINGH", "GURNOOR KAUR",
+    "GURNOOR SINGH", "GURNOOR SINGH", "GURPREET KAUR", "GURSAJ SINGH", "GURSEERAT KAUR", "GURSHAN SINGH",
+    "GURSHAN SINGH", "GURSIMRAN SINGH", "HAETAL KATARIA", "HARANSH SINGH", "HARGUN DEEP SINGH", "HARJAP SINGH",
+    "HARKIRAT SINGH RIAR", "HARMANJOT SINGH", "HARNEET KAUR", "HARNOOR KAUR", "HARSHIL GUPTA", "HARSHIL GUPTA",
+    "HARSHIT MALHOTRA", "HARSHIT MOHAN SHARMA", "HARSHPREET KAUR", "HARSIDAK SINGH", "HARWINDER SINGH",
+    "ISHAN SEHGAL", "ISHITA", "ISHMEET KAUR", "ISHMEET SINGH", "JAGJIT SINGH", "JAGWINDER SINGH",
+    "JAHIRUL ISLAM JOY", "JAHNAVI", "JAHNVI UCHARIA", "JASDEEP KAUR", "JASHANPREET SINGH", "JASKARANJEET SINGH",
+    "JASKIRAT KAUR", "JASLEEN KAUR", "JASMIN KAUR SANDHU", "JASMINE KAUR", "JASPREET KAUR", "JATIN BERI",
+    "JITISH MONGA", "KARAMJIT SINGH", "KARAN SINGH", "KARSIMRAN SINGH", "KASHIKA", "KAVYA ARORA", "KESHAV PURI",
+    "KHUSHAAN LAL", "KHUSHI MEHTA", "KHUSHPREET SINGH", "KIRT PAUL", "KOMALPREET KAUR", "KRISH BHAGAT",
+    "KRISH GUMBER", "KRISH KUMAR", "KRISH NAYYAR", "KRISHAN CHOPRA", "KRISHI SONDHI", "KRISHNA",
+    "KRITAGAYA BHATIA", "KRITIKA MEHTA", "KUNAL", "KUSHAGRAH JAIN"
   ];
-
-  // For duplicate names, assign last 4 digits as a fake unique number for demo purposes:
-  // We'll use a mapping for the original data (normally, you'd fetch this from the original array with IDs)
-  // Here is a mapping for duplicate names to last 4 digits (you can adjust as needed)
   const duplicateSuffix = {
-    "ARSHDEEP SINGH": ["4654", "2374"],
-    "DIVJOT SINGH": ["4304", "1522"],
-    "GURNOOR SINGH": ["3550", "5591"],
-    "GURSHAN SINGH": ["1755", "0584"],
-    "HARSHIL GUPTA": ["2273", "5023"]
+    "ARSHDEEP SINGH": ["4654", "2374"], "DIVJOT SINGH": ["4304", "1522"], "GURNOOR SINGH": ["3550", "5591"],
+    "GURSHAN SINGH": ["1755", "0584"], "HARSHIL GUPTA": ["2273", "5023"]
   };
-
-  // Count names
   const nameCount = {};
-  studentsRaw.forEach(name => {
-    nameCount[name] = (nameCount[name] || 0) + 1;
-  });
-
-  // Prepare final students list: for unique only name, for dups: name (1234), using mapping
+  studentsRaw.forEach(name => { nameCount[name] = (nameCount[name] || 0) + 1; });
   const students = [];
-  const dupSeen = {}; // to track which suffix to use
-
+  const dupSeen = {};
   studentsRaw.forEach(name => {
-    if (nameCount[name] === 1) {
-      students.push([name]);
-    } else {
-      // duplicate
+    if (nameCount[name] === 1) { students.push([name]); } else {
       if (!dupSeen[name]) dupSeen[name] = 0;
       const suffixArr = duplicateSuffix[name];
       let displayName = name;
@@ -197,7 +72,6 @@
         displayName = `${name} (${suffixArr[dupSeen[name]]})`;
         dupSeen[name]++;
       } else {
-        // fallback: still add (XXXX) but with a counter if mapping missing
         displayName = `${name} (${1000 + dupSeen[name]})`;
         dupSeen[name]++;
       }
@@ -205,21 +79,17 @@
     }
   });
 
-  // Date
   const dateObj = new Date();
   const y = dateObj.getFullYear();
   const m = dateObj.getMonth()+1;
   const d = dateObj.getDate();
   document.getElementById("date").innerHTML += `${d}/${m}/${y}`;
 
-  // Table rendering
   const table = document.getElementById("attendanceTable");
   students.forEach(([name], index) => {
     const row = table.insertRow();
-    const cellSerial = row.insertCell();
-    const cellName = row.insertCell();
-    cellSerial.textContent = index + 1;
-    cellName.textContent = name;
+    row.insertCell().textContent = index + 1;
+    row.insertCell().textContent = name;
     row.classList.add("absent");
     row.addEventListener("click", () => {
       row.classList.toggle("present");
@@ -228,34 +98,29 @@
   });
 
   function getPresent() {
-    return Array.from(table.rows)
-      .slice(1)
+    return Array.from(table.rows).slice(1)
       .filter(row => row.classList.contains("present"))
       .map(row => `${row.cells[0].textContent}. ${row.cells[1].textContent}`);
   }
 
   function getAbsent() {
-    return Array.from(table.rows)
-      .slice(1)
+    return Array.from(table.rows).slice(1)
       .filter(row => row.classList.contains("absent"))
       .map(row => `${row.cells[0].textContent}. ${row.cells[1].textContent}`);
   }
 
-  function exportTXT() {
-    const present = getPresent();
-    const absent = getAbsent();
-    const text = `PRESENT STUDENTS (${present.length}):\n${present.join("\n")}\n\nABSENT STUDENTS (${absent.length}):\n${absent.join("\n")}`;
-    const blob = new Blob([text], { type: "text/plain" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "attendance.txt";
-    link.click();
+  function promptForPDFExport() {
+    const password = prompt("Please enter the password to export as PDF:");
+    if (password === "@exportPDF") {
+      exportPDF();
+    } else if (password !== null) {
+      alert("Incorrect password.");
+    }
   }
 
   function exportPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-
     const present = getPresent();
     const absent = getAbsent();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -268,30 +133,25 @@
     doc.text(("Date: " + d + "/" + m + "/" + y), 10, 17);
     doc.text(`Present: ${present.length}, Absent: ${absent.length}, Total: ${students.length}`, 10, 24);
 
-    doc.text("Present Students:", 10, yPos);
-    yPos += lineHeight;
-    doc.setTextColor(0, 128, 0); 
+    doc.text("Present Students:", 10, yPos); yPos += lineHeight;
+    doc.setTextColor(0, 128, 0);
     present.forEach(line => {
       if (yPos > pageHeight - 20) { doc.addPage(); yPos = 20; }
-      doc.text(line, 10, yPos);
-      yPos += lineHeight;
+      doc.text(line, 10, yPos); yPos += lineHeight;
     });
 
     yPos += lineHeight;
     doc.setTextColor(0, 0, 0);
-    doc.text("Absent Students:", 10, yPos);
-    yPos += lineHeight;
-    doc.setTextColor(255, 0, 0); 
+    doc.text("Absent Students:", 10, yPos); yPos += lineHeight;
+    doc.setTextColor(255, 0, 0);
     absent.forEach(line => {
       if (yPos > pageHeight - 20) { doc.addPage(); yPos = 20; }
-      doc.text(line, 10, yPos);
-      yPos += lineHeight;
+      doc.text(line, 10, yPos); yPos += lineHeight;
     });
 
-    doc.setTextColor(0, 0, 0); 
+    doc.setTextColor(0, 0, 0);
     const watermarkText = "Created by: Karamjit Singh, Avnoor Singh Bal";
-    const fontSize = 10;
-    doc.setFontSize(fontSize);
+    doc.setFontSize(10);
     const textWidth = doc.getTextWidth(watermarkText);
     doc.text(watermarkText, pageWidth - textWidth - 10, pageHeight - 10);
 

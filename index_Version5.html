@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>College Attendance Tracker</title>
+  <title>College Attendance Tracker - Section B</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     table { border-collapse: collapse; width: 100%; }
@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<h2>Attendance</h2>
+<h2>Attendance - Section B</h2>
 <p id="date">Date:</p>
 <p>Enter Subject Name: <input id="subject"/></p>
 <table id="attendanceTable">
@@ -23,8 +23,7 @@
   </tr>
 </table>
 
-<button onclick="exportTXT()">Export as TXT</button>
-<button onclick="exportPDF()">Export as PDF</button>
+<button onclick="promptForPDFExport()">Export as PDF</button>
 <button onclick="resetAttendance()">Reset</button>
 
 <div style="position:fixed; bottom:0; right:0; opacity: 0.5; text-align:right">Created by: Karamjit Singh<br>Avnoor Singh Bal</div>
@@ -32,62 +31,42 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-  // Updated students array as provided
+  // Students for Section B
   const studentsRaw = [
-    "LAKSHDEEP", "MALHAR", "MANASVI", "MANJOT", "MANJOT", "MANPAWAN",
-    "MANPREET", "MANRAJDEEP", "MANTHAN", "MANTHAN", "MEHAK", "MEHAK",
-    "MEHAKDEEP", "MEHAKPREET", "MEHAR", "MISHTHI", "MITHILESHWAR",
-    "MOHIT", "MOHIT", "MOHIT", "MOULIK", "MR", "MRIDULA", "MUSKAN",
-    "NANDANI", "NANDINI", "NAVDEEP", "NAVJIT", "NAVJOT", "NAVNEET",
-    "NAVREET", "NAVYA", "NEELESH", "NIMISH", "NIRJALA", "NITISH",
-    "PALAK", "PAVITERPREET", "PAVNEET", "PRABHNOOR", "PRABHNOOR",
-    "PRANAV", "PRINCE", "PRITIKA", "PRIYANSH", "RAGHAV", "RAGHUNANDAN",
-    "RAHUL", "RANVIR", "RASHMITA", "RAVDEEP", "RAYAN", "REHAN",
-    "RIDHAMPREET", "RISHITA", "RIVANSHU", "ROHINI", "ROHIT",
-    "ROOPANSHI", "RUDRAKSH", "RUDRAKSH", "RUHI", "SACHIN", "SAHEJVEER",
-    "SAHIBPREET", "SAHIL", "SAKSHAM", "SAMAIRA", "SAMRIDHI", "SANCHI",
-    "SANYAM", "SATYAK", "SAWAL", "SAWNI", "SHAGUN", "SHASHANK",
-    "SHATRUNJAY", "SHAURYA", "SHIVANG", "SHIVANSH", "SHIVJOT",
-    "SHREYANSH", "SIDARTH", "SIRTAJ", "SIYA", "SOURAV", "SUKHMANI",
-    "SUKHMANJEET", "SUKHMANPREET", "SUKHPAL", "SUNAKSHI", "SUNDRAM",
-    "SUNIDHI", "SURYA", "SUSHANK", "SUSHEN", "TANDRIKA", "TANMYA",
-    "TEJ", "TRIBHUVAN", "TUSHAAR", "UJWAL", "UTTAMPREET", "VAIBHAV",
-    "VAISHALI", "VARENYA", "VARUN", "VENU", "VINEET", "VINOD",
-    "VISHAL", "VISHESH", "YASHIKA", "YOGITA", "YUVRAJ", "JATIN"
+    "LAKSHDEEP", "MALHAR", "MANASVI", "MANJOT", "MANJOT", "MANPAWAN", "MANPREET", "MANRAJDEEP", "MANTHAN",
+    "MANTHAN", "MEHAK", "MEHAK", "MEHAKDEEP", "MEHAKPREET", "MEHAR", "MISHTHI", "MITHILESHWAR", "MOHIT",
+    "MOHIT", "MOHIT", "MOULIK", "MR", "MRIDULA", "MUSKAN", "NANDANI", "NANDINI", "NAVDEEP", "NAVJIT",
+    "NAVJOT", "NAVNEET", "NAVREET", "NAVYA", "NEELESH", "NIMISH", "NIRJALA", "NITISH", "PALAK",
+    "PAVITERPREET", "PAVNEET", "PRABHNOOR", "PRABHNOOR", "PRANAV", "PRINCE", "PRITIKA", "PRIYANSH",
+    "RAGHAV", "RAGHUNANDAN", "RAHUL", "RANVIR", "RASHMITA", "RAVDEEP", "RAYAN", "REHAN", "RIDHAMPREET",
+    "RISHITA", "RIVANSHU", "ROHINI", "ROHIT", "ROOPANSHI", "RUDRAKSH", "RUDRAKSH", "RUHI", "SACHIN",
+    "SAHEJVEER", "SAHIBPREET", "SAHIL", "SAKSHAM", "SAMAIRA", "SAMRIDHI", "SANCHI", "SANYAM", "SATYAK",
+    "SAWAL", "SAWNI", "SHAGUN", "SHASHANK", "SHATRUNJAY", "SHAURYA", "SHIVANG", "SHIVANSH", "SHIVJOT",
+    "SHREYANSH", "SIDARTH", "SIRTAJ", "SIYA", "SOURAV", "SUKHMANI", "SUKHMANJEET", "SUKHMANPREET",
+    "SUKHPAL", "SUNAKSHI", "SUNDRAM", "SUNIDHI", "SURYA", "SUSHANK", "SUSHEN", "TANDRIKA", "TANMYA",
+    "TEJ", "TRIBHUVAN", "TUSHAAR", "UJWAL", "UTTAMPREET", "VAIBHAV", "VAISHALI", "VARENYA", "VARUN",
+    "VENU", "VINEET", "VINOD", "VISHAL", "VISHESH", "YASHIKA", "YOGITA", "YUVRAJ", "JATIN"
   ];
 
-  // Detect duplicates and append (1), (2), ... to duplicate names
   const nameCount = {};
-  studentsRaw.forEach(name => {
-    nameCount[name] = (nameCount[name] || 0) + 1;
-  });
-
-  // For duplicate names, append (1), (2), etc., for uniqueness
+  studentsRaw.forEach(name => { nameCount[name] = (nameCount[name] || 0) + 1; });
   const dupSeen = {};
   const students = studentsRaw.map(name => {
-    if (nameCount[name] === 1) {
-      return [name];
-    } else {
-      dupSeen[name] = (dupSeen[name] || 0) + 1;
-      return [`${name} (${dupSeen[name]})`];
-    }
+    if (nameCount[name] === 1) { return [name]; }
+    else { dupSeen[name] = (dupSeen[name] || 0) + 1; return [`${name} (${dupSeen[name]})`]; }
   });
 
-  // Date
   const dateObj = new Date();
   const y = dateObj.getFullYear();
   const m = dateObj.getMonth()+1;
   const d = dateObj.getDate();
   document.getElementById("date").innerHTML += `${d}/${m}/${y}`;
 
-  // Table rendering
   const table = document.getElementById("attendanceTable");
   students.forEach(([name], index) => {
     const row = table.insertRow();
-    const cellSerial = row.insertCell();
-    const cellName = row.insertCell();
-    cellSerial.textContent = index + 1;
-    cellName.textContent = name;
+    row.insertCell().textContent = index + 1;
+    row.insertCell().textContent = name;
     row.classList.add("absent");
     row.addEventListener("click", () => {
       row.classList.toggle("present");
@@ -96,34 +75,29 @@
   });
 
   function getPresent() {
-    return Array.from(table.rows)
-      .slice(1)
+    return Array.from(table.rows).slice(1)
       .filter(row => row.classList.contains("present"))
       .map(row => `${row.cells[0].textContent}. ${row.cells[1].textContent}`);
   }
 
   function getAbsent() {
-    return Array.from(table.rows)
-      .slice(1)
+    return Array.from(table.rows).slice(1)
       .filter(row => row.classList.contains("absent"))
       .map(row => `${row.cells[0].textContent}. ${row.cells[1].textContent}`);
   }
-
-  function exportTXT() {
-    const present = getPresent();
-    const absent = getAbsent();
-    const text = `PRESENT STUDENTS (${present.length}):\n${present.join("\n")}\n\nABSENT STUDENTS (${absent.length}):\n${absent.join("\n")}`;
-    const blob = new Blob([text], { type: "text/plain" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "attendance.txt";
-    link.click();
+  
+  function promptForPDFExport() {
+    const password = prompt("Please enter the password to export as PDF:");
+    if (password === "@exportPDF") {
+      exportPDF();
+    } else if (password !== null) {
+      alert("Incorrect password.");
+    }
   }
 
   function exportPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-
     const present = getPresent();
     const absent = getAbsent();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -136,30 +110,25 @@
     doc.text(("Date: " + d + "/" + m + "/" + y), 10, 17);
     doc.text(`Present: ${present.length}, Absent: ${absent.length}, Total: ${students.length}`, 10, 24);
 
-    doc.text("Present Students:", 10, yPos);
-    yPos += lineHeight;
-    doc.setTextColor(0, 128, 0); 
+    doc.text("Present Students:", 10, yPos); yPos += lineHeight;
+    doc.setTextColor(0, 128, 0);
     present.forEach(line => {
       if (yPos > pageHeight - 20) { doc.addPage(); yPos = 20; }
-      doc.text(line, 10, yPos);
-      yPos += lineHeight;
+      doc.text(line, 10, yPos); yPos += lineHeight;
     });
 
     yPos += lineHeight;
     doc.setTextColor(0, 0, 0);
-    doc.text("Absent Students:", 10, yPos);
-    yPos += lineHeight;
-    doc.setTextColor(255, 0, 0); 
+    doc.text("Absent Students:", 10, yPos); yPos += lineHeight;
+    doc.setTextColor(255, 0, 0);
     absent.forEach(line => {
       if (yPos > pageHeight - 20) { doc.addPage(); yPos = 20; }
-      doc.text(line, 10, yPos);
-      yPos += lineHeight;
+      doc.text(line, 10, yPos); yPos += lineHeight;
     });
 
-    doc.setTextColor(0, 0, 0); 
+    doc.setTextColor(0, 0, 0);
     const watermarkText = "Created by: Karamjit Singh, Avnoor Singh Bal";
-    const fontSize = 10;
-    doc.setFontSize(fontSize);
+    doc.setFontSize(10);
     const textWidth = doc.getTextWidth(watermarkText);
     doc.text(watermarkText, pageWidth - textWidth - 10, pageHeight - 10);
 
