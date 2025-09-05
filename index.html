@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>College Attendance Tracker</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; cursor: pointer; }
+    button { margin: 5px; padding: 8px 12px; }
+    
+    /* Default (absent) state is plain white */
+    tr.absent { background-color: #ffffff; }
+    
+    /* When marked present, the entire row becomes green */
+    tr.present { background-color: #c8f7c5; }
+
+  </style>
+</head>
+<body>
+
+<h2>Attendance</h2>
+<p id="date">Date:</p>
+<p>Enter Subject Name: <input id="subject"/></p>
+<table id="attendanceTable">
+  <tr>
+    <th>Student ID</th>
+    <th>Roll No.</th>
+    <th>Student Name</th>
+  </tr>
+</table>
+
+<button onclick="exportTXT()">Export as TXT</button>
+<button onclick="exportPDF()">Export as PDF</button>
+<button onclick="resetAttendance()">Reset</button>
+
+<div style="position:fixed; bottom:0; right:0; opacity: 0.5; text-align:right">Created by: Karamjit Singh<br>Avnoor Singh Bal</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+  const students = [
+    ["2025010015434", "AARUSHI SETHI"],
+    ["2025010005665", "ABHAY SINGH"],
+    ["2025010009998", "ABHI VERMA"],
+    ["2025010005224", "AKARSHDEEP SINGH"],
+    ["2025010008868", "AKASHDEEP SINGH"],
+    ["2025010016443", "AMANAT SHARMA"],
+    ["2025010016440", "AMANDEEP KAUR"],
+    ["2025010008871", "AMRIK SINGH"],
+    ["2025010010244", "ANANYA SINGLA"],
+    ["2025010003183", "ANGEL GUPTA"],
+    ["2025010013005", "ANIKET"],
+    ["2025010002118", "ANKIT KUMAR"],
+    ["2025010011550", "ANMOLDEEP KAUR"],
+    ["2025010000276", "ANMOLPREET KAUR"],
+    ["2025010004847", "ANSH AHLAWAT"],
+    ["2025010013900", "ANUSHKA"],
+    ["2025010000861", "ARCHIE DHIR"],
+    ["2025010008302", "ARIHANT SHARMA"],
+    ["2025010006979", "ARMAAN DEORA"],
+    ["2025010001547", "ARMAANDEEP SINGH"],
+    ["2025010000267", "ARNAV CHANDEL"],
+    ["2024010014654", "ARSHDEEP SINGH"],
+    ["2025010002374", "ARSHDEEP SINGH"],
+    ["2025010014563", "ARYAN RAJ"],
+    ["2025010015489", "ARYANSH"],
+    ["2025010003138", "ASHIMA"],
+    ["2025010003547", "ATHARV KAUL"],
+    ["2025010012860", "AVNOOR SINGH BAL"],
+    ["2025010005555", "AVZ SHARMA"],
+    ["2024010016746", "AYUSH RAJ"],
+    ["2025010004399", "BALGOPAL RAI SINGH"],
+    ["2025010005755", "BARINDERPAL SINGH"],
+    ["2025010001463", "BISHAV HANS"],
+    ["2025010004099", "BHAKTI GUPTA"],
+    ["2025010000795", "BHAUMIK"],
+    ["2025010003276", "BHAVYA"],
+    ["2025010016030", "BHAVYA SHARMA"],
+    ["2025010001950", "BIRJOT KAUR"],
+    ["2025010003520", "CHAHAT"],
+    ["2025010000612", "CHAKSHIKA CHAWLA"],
+    ["2025010004107", "CHARU MALHOTRA"],
+    ["2025010004677", "CHAUDHARY ASHUTOSH KUMAR"],
+    ["2025010005245", "DEEPALI LUTHRA"],
+    ["2025010006358", "DEEPIKA"],
+    ["2025010010186", "DEVAM SAGGU"],
+    ["2024010002759", "DEVANG"],
+    ["2025010004671", "DHRUV PATHANIA"],
+    ["2025010002282", "DHRUV SHARMA"],
+    ["2025010008845", "DILJOT KAUR"],
+    ["2025010000451", "DIVYA"],
+    ["2025010006393", "DINKAR MITTAL"],
+    ["2025010003586", "DIPTI"],
+    ["2025010004304", "DIVJOT SINGH"],
+    ["2025010001522", "DIVJOT SINGH"],
+    ["2025010014809", "DIVYANSH"],
+    ["2025010001690", "GARIMA TRIKHA"],
+    ["2025010014776", "GARV SEHGAL"],
+    ["2025010002330", "GOUTAM KUMAR"],
+    ["2025010011645", "GURANGAD SINGH"],
+    ["2025010016044", "GURANSHPREET SINGH"],
+    ["2025010001196", "GURJASHAN SINGH"],
+    ["2025010012637", "GURMANNAT KAUR"],
+    ["2025010009266", "GURMEET SINGH"],
+    ["2025010006392", "GURNOOR KAUR"],
+    ["2025010003550", "GURNOOR SINGH"],
+    ["2025010005591", "GURNOOR SINGH"],
+    ["2025010004432", "GURPREET KAUR"],
+    ["2025010009174", "GURSAJ SINGH"],
+    ["2025010002695", "GURSEERAT KAUR"],
+    ["2025010001755", "GURSHAN SINGH"],
+    ["2025010000584", "GURSHAN SINGH"],
+    ["2025010012122", "GURSIMRAN SINGH"],
+    ["2025010003129", "HAETAL KATARIA"],
+    ["2025010004621", "HARANSH SINGH"],
+    ["2025010006241", "HARGUN DEEP SINGH"],
+    ["2025010010412", "HARJAP SINGH"],
+    ["2025010009576", "HARKIRAT SINGH RIAR"],
+    ["2025010013999", "HARMANJOT SINGH"],
+    ["2025010008597", "HARNEET KAUR"],
+    ["2025010006181", "HARNOOR KAUR"],
+    ["2025010002273", "HARSHIL GUPTA"],
+    ["2025010005023", "HARSHIL GUPTA"],
+    ["2025010007903", "HARSHIT MALHOTRA"],
+    ["2025010003642", "HARSHIT MOHAN SHARMA"],
+    ["2025010013101", "HARSHPREET KAUR"],
+    ["2025010005296", "HARSIDAK SINGH"],
+    ["2025010008876", "HARWINDER SINGH"],
+    ["2025010000288", "ISHAN SEHGAL"],
+    ["2025010014878", "ISHITA"],
+    ["2025010012336", "ISHMEET KAUR"],
+    ["2025010000741", "ISHMEET SINGH"],
+    ["2025010008223", "JAGJIT SINGH"],
+    ["2025010000873", "JAGWINDER SINGH"],
+    ["2025010032102", "JAHIRUL ISLAM JOY"],
+    ["2025010016002", "JAHNAVI"],
+    ["2025010012444", "JAHNVI UCHARIA"],
+    ["2025010008140", "JASDEEP KAUR"],
+    ["2025010012568", "JASHANPREET SINGH"],
+    ["2025010001543", "JASKARANJEET SINGH"],
+    ["2025010015917", "JASKIRAT KAUR"],
+    ["2025010011115", "JASLEEN KAUR"],
+    ["2025010011132", "JASMIN KAUR SANDHU"],
+    ["2025010014854", "JASMINE KAUR"],
+    ["2025010014200", "JASPREET KAUR"],
+    ["2025010001815", "JATIN BERI"],
+    ["2025010004977", "JITISH MONGA"],
+    ["2025010012241", "KARAMJIT SINGH"],
+    ["2025010015784", "KARAN SINGH"],
+    ["2025010000879", "KARSIMRAN SINGH"],
+    ["2025010004114", "KASHIKA"],
+    ["2025010006425", "KAVYA ARORA"],
+    ["2025010006506", "KESHAV PURI"],
+    ["2025010001874", "KHUSHAAN LAL"],
+    ["2025010004685", "KHUSHI MEHTA"],
+    ["2025010001769", "KHUSHPREET SINGH"],
+    ["2025010002095", "KIRT PAUL"],
+    ["2025010005761", "KOMALPREET KAUR"],
+    ["2025010004080", "KRISH BHAGAT"],
+    ["2025010001283", "KRISH GUMBER"],
+    ["2025010009484", "KRISH KUMAR"],
+    ["2024010004832", "KRISH NAYYAR"],
+    ["2025010001668", "KRISHAN CHOPRA"],
+    ["2025010007443", "KRISHI SONDHI"],
+    ["2025010013924", "KRISHNA"],
+    ["2025010003369", "KRITAGAYA BHATIA"],
+    ["2025010006426", "KRITIKA MEHTA"],
+    ["2025010015474", "KUNAL"],
+    ["2025010008422", "KUSHAGRAH JAIN"]
+  ];
+  
+  const dateObj = new Date();
+  const y = dateObj.getFullYear();
+  const m = dateObj.getMonth()+1;
+  const d = dateObj.getDate();
+  document.getElementById("date").innerHTML += `${d}/${m}/${y}`;
+
+  const table = document.getElementById("attendanceTable");
+
+  students.forEach(([id, name], index) => {
+    const row = table.insertRow();
+    const cellID = row.insertCell();
+    const cellSerial = row.insertCell();
+    const cellName = row.insertCell();
+    cellID.textContent = id;
+    cellSerial.textContent = index + 1;
+    cellName.textContent = name;
+    // By default, every row is 'absent'
+    row.classList.add("absent");
+    // On click, the classes are toggled
+    row.addEventListener("click", () => {
+      row.classList.toggle("present");
+      row.classList.toggle("absent");
+    });
+  });
+
+  function getPresent() {
+    return Array.from(table.rows)
+      .slice(1)
+      .filter(row => row.classList.contains("present"))
+      .map(row => `${row.cells[1].textContent}. ${row.cells[0].textContent} - ${row.cells[2].textContent}`);
+  }
+
+  function getAbsent() {
+    return Array.from(table.rows)
+      .slice(1)
+      .filter(row => row.classList.contains("absent"))
+      .map(row => `${row.cells[1].textContent}. ${row.cells[0].textContent} - ${row.cells[2].textContent}`);
+  }
+
+  function exportTXT() {
+    const present = getPresent();
+    const absent = getAbsent();
+    const text = `PRESENT STUDENTS (${present.length}):\n${present.join("\n")}\n\nABSENT STUDENTS (${absent.length}):\n${absent.join("\n")}`;
+    const blob = new Blob([text], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "attendance.txt";
+    link.click();
+  }
+
+  function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const present = getPresent();
+    const absent = getAbsent();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let yPos = 30;
+    const lineHeight = 7;
+
+    doc.setTextColor(0, 0, 0);
+    doc.text("Subject: " + document.getElementById("subject").value, 10, 10);
+    doc.text(("Date: " + d + "/" + m + "/" + y), 10, 17);
+    doc.text(`Present: ${present.length}, Absent: ${absent.length}, Total: ${students.length}`, 10, 24);
+
+    doc.text("Present Students:", 10, yPos);
+    yPos += lineHeight;
+    doc.setTextColor(0, 128, 0); 
+    present.forEach(line => {
+      if (yPos > pageHeight - 20) { doc.addPage(); yPos = 20; }
+      doc.text(line, 10, yPos);
+      yPos += lineHeight;
+    });
+
+    yPos += lineHeight;
+    doc.setTextColor(0, 0, 0);
+    doc.text("Absent Students:", 10, yPos);
+    yPos += lineHeight;
+    doc.setTextColor(255, 0, 0); 
+    absent.forEach(line => {
+      if (yPos > pageHeight - 20) { doc.addPage(); yPos = 20; }
+      doc.text(line, 10, yPos);
+      yPos += lineHeight;
+    });
+
+    doc.setTextColor(0, 0, 0); 
+    const watermarkText = "Created by: Karamjit Singh, Avnoor Singh Bal";
+    const fontSize = 10;
+    doc.setFontSize(fontSize);
+    const textWidth = doc.getTextWidth(watermarkText);
+    doc.text(watermarkText, pageWidth - textWidth - 10, pageHeight - 10);
+
+    doc.save("attendance.pdf");
+  }
+
+  function resetAttendance() {
+    Array.from(table.rows).slice(1).forEach(row => {
+      row.classList.remove("present");
+      row.classList.add("absent");
+    });
+  }
+</script>
+
+</body>
+</html>
