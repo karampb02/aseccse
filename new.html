@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Attendance Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    /* Custom styles for attendance status for better visual feedback */
+    tr.absent { background-color: #fef2f2; /* red-100 */ }
+    tr.present { background-color: #dcfce7; /* green-100 */ color: #166534; /* green-800 */ font-weight: 500; }
+    /* Active tab style */
+    .tab-active {
+        background-color: #ffffff;
+        color: #111827;
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+<div class="container mx-auto p-4 md:p-8">
+
+  <div class="mb-6 flex justify-center">
+    <div class="bg-gray-200 p-1 rounded-lg shadow-inner">
+      <button id="tabA" onclick="loadSection('A')" class="px-6 py-2 font-semibold rounded-md transition-all duration-300">Section A</button>
+      <button id="tabB" onclick="loadSection('B')" class="px-6 py-2 font-semibold rounded-md transition-all duration-300">Section B</button>
+    </div>
+  </div>
+  
+  <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+      <div>
+        <h2 id="sectionTitle" class="text-3xl font-bold text-gray-800"></h2>
+        <p id="date" class="text-gray-500 mt-1">Date: </p>
+      </div>
+      <div class="mt-4 md:mt-0 w-full md:w-1/3">
+        <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject Name</label>
+        <input id="subject" class="w-full p-2 border border-gray-300 rounded-md shadow-sm" placeholder="e.g., Data Structures"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+    <table id="attendanceTable" class="w-full text-left">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="px-6 py-4 font-semibold uppercase text-sm text-gray-600">Roll No.</th>
+          <th class="px-6 py-4 font-semibold uppercase text-sm text-gray-600">Student Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        </tbody>
+    </table>
+  </div>
+
+  <div class="mt-8 flex justify-end gap-4">
+    <button onclick="resetAttendance()" class="px-6 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105 hover:bg-gray-700">Reset</button>
+    <button id="exportButton" onclick="promptForPDFExport()" class="px-6 py-2 text-white font-semibold rounded-lg shadow-md transition-transform transform hover:scale-105">Export as PDF</button>
+  </div>
+
+  <footer class="text-center text-gray-500 text-sm mt-12">
+    <p>Created by: Karamjit Singh & Avnoor Singh Bal</p>
+  </footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  // --- Data Configuration for Both Sections ---
+  const sectionData = {
+    'A': {
+      title: "Attendance - Section A",
+      studentsRaw: [
+        "AARUSHI SETHI", "ABHAY SINGH", "ABHI VERMA", "AKARSHDEEP SINGH", "AKASHDEEP SINGH", "AMANAT SHARMA",
+        "AMANDEEP KAUR", "AMRIK SINGH", "ANANYA SINGLA", "ANGEL GUPTA", "ANIKET", "ANKIT KUMAR",
+        "ANMOLDEEP KAUR", "ANMOLPREET KAUR", "ANSH AHLAWAT", "ANUSHKA", "ARCHIE DHIR", "ARIHANT SHARMA",
+        "ARMAAN DEORA", "ARMAANDEEP SINGH", "ARNAV CHANDEL", "ARSHDEEP SINGH", "ARSHDEEP SINGH", "ARYAN RAJ",
+        "ARYANSH", "ASHIMA", "ATHARV KAUL", "AVNOOR SINGH BAL", "AVZ SHARMA", "AYUSH RAJ", "BALGOPAL RAI SINGH",
+        "BARINDERPAL SINGH", "BISHAV HANS", "BHAKTI GUPTA", "BHAUMIK", "BHAVYA", "BHAVYA SHARMA", "BIRJOT KAUR",
+        "CHAHAT", "CHAKSHIKA CHAWLA", "CHARU MALHOTRA", "CHAUDHARY ASHUTOSH KUMAR", "DEEPALI LUTHRA", "DEEPIKA",
+        "DEVAM SAGGU", "DEVANG", "DHRUV PATHANIA", "DHRUV SHARMA", "DILJOT KAUR", "DIVYA", "DINKAR MITTAL",
+        "DIPTI", "DIVJOT SINGH", "DIVJOT SINGH", "DIVYANSH", "GARIMA TRIKHA", "GARV SEHGAL", "GOUTAM KUMAR",
+        "GURANGAD SINGH", "GURANSHPREET SINGH", "GURJASHAN SINGH", "GURMANNAT KAUR", "GURMEET SINGH", "GURNOOR KAUR",
+        "GURNOOR SINGH", "GURNOOR SINGH", "GURPREET KAUR", "GURSAJ SINGH", "GURSEERAT KAUR", "GURSHAN SINGH",
+        "GURSHAN SINGH", "GURSIMRAN SINGH", "HAETAL KATARIA", "HARANSH SINGH", "HARGUN DEEP SINGH", "HARJAP SINGH",
+        "HARKIRAT SINGH RIAR", "HARMANJOT SINGH", "HARNEET KAUR", "HARNOOR KAUR", "HARSHIL GUPTA", "HARSHIL GUPTA",
+        "HARSHIT MALHOTRA", "HARSHIT MOHAN SHARMA", "HARSHPREET KAUR", "HARSIDAK SINGH", "HARWINDER SINGH",
+        "ISHAN SEHGAL", "ISHITA", "ISHMEET KAUR", "ISHMEET SINGH", "JAGJIT SINGH", "JAGWINDER SINGH",
+        "JAHIRUL ISLAM JOY", "JAHNAVI", "JAHNVI UCHARIA", "JASDEEP KAUR", "JASHANPREET SINGH", "JASKARANJEET SINGH",
+        "JASKIRAT KAUR", "JASLEEN KAUR", "JASMIN KAUR SANDHU", "JASMINE KAUR", "JASPREET KAUR", "JATIN BERI",
+        "JITISH MONGA", "KARAMJIT SINGH", "KARAN SINGH", "KARSIMRAN SINGH", "KASHIKA", "KAVYA ARORA", "KESHAV PURI",
+        "KHUSHAAN LAL", "KHUSHI MEHTA", "KHUSHPREET SINGH", "KIRT PAUL", "KOMALPREET KAUR", "KRISH BHAGAT",
+        "KRISH GUMBER", "KRISH KUMAR", "KRISH NAYYAR", "KRISHAN CHOPRA", "KRISHI SONDHI", "KRISHNA",
+        "KRITAGAYA BHATIA", "KRITIKA MEHTA", "KUNAL", "KUSHAGRAH JAIN"
+      ],
+      duplicateSuffix: {
+        "ARSHDEEP SINGH": ["4654", "2374"], "DIVJOT SINGH": ["4304", "1522"], "GURNOOR SINGH": ["3550", "5591"],
+        "GURSHAN SINGH": ["1755", "0584"], "HARSHIL GUPTA": ["2273", "5023"]
+      },
+      password: "waheguru",
+      fileName: "attendance_section_a.pdf",
+      theme: {
+        button: ['bg-blue-500', 'hover:bg-blue-600'],
+        focus: ['focus:ring-blue-500', 'focus:border-blue-500']
+      }
+    },
+    'B': {
+      title: "Attendance - Section B",
+      studentsRaw: [
+        "LAKSHDEEP SINGH", "MALHAR ARORA", "MANASVI", "MANJOT KAUR", "MANJOT SINGH", "MANPAWAN KAUR",
+        "MANPREET KUMAR", "MANRAJDEEP SINGH", "MANTHAN ATTRI", "MANTHAN SHARMA", "MEHAK GUPTA", "MEHAK PADWAL",
+        "MEHAKDEEP KAUR", "MEHAKPREET SINGH", "MEHAR JOLLY", "MISHTHI", "MITHILESHWAR", "MOHIT", "MOHIT SALWAN",
+        "MOHIT SINGH", "MOULIK YADAV", "MR SAKSHAM", "MRIDULA", "MUSKAN", "NANDANI GARG", "NANDINI RATHORE",
+        "NAVDEEP KAUR", "NAVJIT KAPIL", "NAVJOT KAUR", "NAVNEET KAUR", "NAVREET KAUR", "NAVYA", "NEELESH KALIA",
+        "NIMISH SURI", "NIRJALA", "NITISH", "PALAK SHARMA", "PAVITERPREET SINGH", "PAVNEET SINGH", "PRABHNOOR KAUR",
+        "PRABHNOOR SINGH", "PRANAV JOSHI", "PRINCE KUMAR", "PRITIKA", "PRIYANSH", "RAGHAV SHARMA", "RAGHUNANDAN",
+        "RAHUL SHARMA", "RANVIR SINGH", "RASHMITA", "RAVDEEP KAUR", "RAYAN CHANDEL", "REHAN SINGH",
+        "RIDHAMPREET SINGH", "RISHITA", "RIVANSHU BEHAL", "ROHINI SHARMA", "ROHIT KUMAR", "ROOPANSHI SHARMA",
+        "RUDRAKSH MEHRA", "RUDRAKSH SHARMA", "RUHI", "SACHIN KUMAR", "SAHEJVEER SINGH", "SAHIBPREET SINGH",
+        "SAHIL GUPTA", "SAKSHAM GUPTA", "SAMAIRA", "SAMRIDHI SHARMA", "SANCHI SHARMA", "SANYAM GAUTAM",
+        "SATYAK GUPTA", "SAWAL PUSHKARNA", "SAWNI", "SHAGUN KAUR", "SHASHANK SHEKHAR", "SHATRUNJAY SINGH",
+        "SHAURYA THAKUR", "SHIVANG GUPTA", "SHIVANSH SHUKLA", "SHIVJOT SINGH", "SHREYANSH", "SIDARTH ATTRI",
+        "SIRTAJ SINGH", "SIYA", "SOURAV", "SUKHMANI", "SUKHMANJEET SINGH", "SUKHMANPREET", "SUKHPAL SINGH",
+        "SUNAKSHI MEHTA", "SUNDRAM KUMAR", "SUNIDHI SOOD", "SURYA DEY", "SUSHANK BALHOTRA", "SUSHEN GUPTA",
+        "TANDRIKA RANI KUNDU", "TANMYA MAHAJAN", "TEJ AL CHOPRA", "TRIBHUVAN SINGH", "TUSHAAR", "UJWAL",
+        "UTTAMPREET KAUR", "VAIBHAV MAHAJAN", "VAISHALI KUNDAL", "VARENYA MAHAJAN", "VARUN ALOONA",
+        "VENU GOPAL", "VINEET KUMAR", "VINOD PARMAR", "VISHAL CHOUDHARY", "VISHESH KUMAR", "YASHIKA",
+        "YOGITA", "YUVRAJ JASSI", "JATIN"
+      ],
+      password: "@Bsec",
+      fileName: "attendance_section_b.pdf",
+      theme: {
+        button: ['bg-teal-500', 'hover:bg-teal-600'],
+        focus: ['focus:ring-teal-500', 'focus:border-teal-500']
+      }
+    }
+  };
+
+  let currentSectionId = '';
+  let currentStudents = [];
+  const tableBody = document.querySelector("#attendanceTable tbody");
+  const dateObj = new Date();
+  const y = dateObj.getFullYear();
+  const m = dateObj.getMonth() + 1;
+  const d = dateObj.getDate();
+
+  document.getElementById("date").innerHTML += `${d}/${m}/${y}`;
+
+  function processStudentNames(sectionId) {
+    const { studentsRaw, duplicateSuffix } = sectionData[sectionId];
+    const nameCount = {};
+    studentsRaw.forEach(name => { nameCount[name] = (nameCount[name] || 0) + 1; });
+    const processedStudents = [];
+    const dupSeen = {};
+
+    studentsRaw.forEach(name => {
+        if (nameCount[name] === 1) {
+            processedStudents.push(name);
+        } else {
+            if (!dupSeen[name]) dupSeen[name] = 0;
+            let displayName = name;
+            // Section A has specific suffixes
+            if (duplicateSuffix) {
+                const suffixArr = duplicateSuffix[name];
+                if (suffixArr && dupSeen[name] < suffixArr.length) {
+                    displayName = `${name} (${suffixArr[dupSeen[name]]})`;
+                } else {
+                    displayName = `${name} (${1000 + dupSeen[name]})`; // Fallback
+                }
+            } else { // Section B uses a simple counter
+                displayName = `${name} (${dupSeen[name] + 1})`;
+            }
+            dupSeen[name]++;
+            processedStudents.push(displayName);
+        }
+    });
+    return processedStudents;
+  }
+
+  function loadSection(sectionId) {
+    if (currentSectionId === sectionId) return;
+    currentSectionId = sectionId;
+
+    const config = sectionData[sectionId];
+    currentStudents = processStudentNames(sectionId);
+
+    // Update UI elements
+    document.getElementById('sectionTitle').textContent = config.title;
+    
+    const exportButton = document.getElementById('exportButton');
+    const subjectInput = document.getElementById('subject');
+    const allThemes = ['bg-blue-500', 'hover:bg-blue-600', 'bg-teal-500', 'hover:bg-teal-600', 'focus:ring-blue-500', 'focus:border-blue-500', 'focus:ring-teal-500', 'focus:border-teal-500'];
+    exportButton.classList.remove(...allThemes);
+    subjectInput.classList.remove(...allThemes);
+    exportButton.classList.add(...config.theme.button);
+    subjectInput.classList.add(...config.theme.focus);
+
+    // Update active tab
+    document.getElementById('tabA').classList.toggle('tab-active', sectionId === 'A');
+    document.getElementById('tabB').classList.toggle('tab-active', sectionId === 'B');
+
+    // Populate table
+    tableBody.innerHTML = '';
+    currentStudents.forEach((name, index) => {
+      const row = tableBody.insertRow();
+      row.insertCell().textContent = index + 1;
+      row.insertCell().textContent = name;
+      
+      row.cells[0].classList.add('px-6', 'py-4', 'border-b', 'border-gray-200');
+      row.cells[1].classList.add('px-6', 'py-4', 'border-b', 'border-gray-200');
+
+      row.classList.add("absent", "cursor-pointer", "transition-colors", "duration-200");
+      row.addEventListener("click", () => {
+        row.classList.toggle("present");
+        row.classList.toggle("absent");
+      });
+    });
+  }
+
+  function getPresent() {
+    return Array.from(tableBody.rows)
+      .filter(row => row.classList.contains("present"))
+      .map(row => `${row.cells[0].textContent}. ${row.cells[1].textContent}`);
+  }
+
+  function getAbsent() {
+    return Array.from(tableBody.rows)
+      .filter(row => row.classList.contains("absent"))
+      .map(row => `${row.cells[0].textContent}. ${row.cells[1].textContent}`);
+  }
+  
+  function promptForPDFExport() {
+    const password = prompt("Please enter the password to export as PDF:");
+    if (password === sectionData[currentSectionId].password) {
+      exportPDF();
+    } else if (password !== null) {
+      alert("Incorrect password.");
+    }
+  }
+
+  function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const config = sectionData[currentSectionId];
+    const present = getPresent();
+    const absent = getAbsent();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let yPos = 30;
+    const lineHeight = 7;
+    
+    doc.setFont("helvetica", "bold");
+    doc.text("Attendance Report - " + config.title.split(' - ')[1], pageWidth / 2, 15, { align: "center" });
+    doc.setFont("helvetica", "normal");
+
+    doc.setTextColor(0, 0, 0);
+    doc.text("Subject: " + document.getElementById("subject").value, 15, 25);
+    doc.text(`Date: ${d}/${m}/${y}`, 15, 32);
+    doc.text(`Present: ${present.length}, Absent: ${absent.length}, Total: ${currentStudents.length}`, 15, 39);
+    yPos = 50;
+    
+    doc.setFont("helvetica", "bold");
+    doc.text("Present Students:", 15, yPos); yPos += lineHeight;
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(34, 139, 34); // ForestGreen
+    present.forEach(line => {
+      if (yPos > pageHeight - 20) { doc.addPage(); yPos = 20; }
+      doc.text(line, 15, yPos); yPos += lineHeight;
+    });
+
+    yPos += lineHeight;
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "bold");
+    doc.text("Absent Students:", 15, yPos); yPos += lineHeight;
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(220, 20, 60); // Crimson
+    absent.forEach(line => {
+      if (yPos > pageHeight - 20) { doc.addPage(); yPos = 20; }
+      doc.text(line, 15, yPos); yPos += lineHeight;
+    });
+
+    doc.setTextColor(150, 150, 150);
+    const watermarkText = "Created by: Karamjit Singh, Avnoor Singh Bal";
+    doc.setFontSize(8);
+    const textWidth = doc.getTextWidth(watermarkText);
+    doc.text(watermarkText, pageWidth - textWidth - 10, pageHeight - 10);
+
+    doc.save(config.fileName);
+  }
+
+  function resetAttendance() {
+    Array.from(tableBody.rows).forEach(row => {
+      row.classList.remove("present");
+      row.classList.add("absent");
+    });
+  }
+  
+  // Initial load
+  window.onload = () => {
+    loadSection('A');
+  };
+</script>
+</body>
+</html>
