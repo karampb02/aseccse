@@ -111,6 +111,7 @@ python app.py
 - Secret key configurable via environment
 - OAuth redirect URIs validated
 - No hardcoded credentials
+- **Updated spotipy to 2.25.1** - Fixes cache file permissions vulnerability (CVE: cache file with auth token created with overly broad permissions in versions < 2.25.1)
 
 ❌ Not suitable for production without:
 - Persistent credential storage (database)

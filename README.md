@@ -185,6 +185,7 @@ aseccse/
 - Store credentials securely (not in sessions for production apps)
 - **Debug mode is disabled by default** - only enable in development by setting `FLASK_ENV=development`
 - Use a production WSGI server (like Gunicorn or uWSGI) instead of Flask's built-in server for production
+- **Dependencies are kept up-to-date** to patch known vulnerabilities (e.g., spotipy 2.25.1+ fixes auth token cache file permissions issue)
 
 ## Limitations
 
