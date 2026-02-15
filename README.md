@@ -183,6 +183,8 @@ aseccse/
 - Keep your `FLASK_SECRET_KEY` secure and random
 - In production, use environment variables or secure secret management
 - Store credentials securely (not in sessions for production apps)
+- **Debug mode is disabled by default** - only enable in development by setting `FLASK_ENV=development`
+- Use a production WSGI server (like Gunicorn or uWSGI) instead of Flask's built-in server for production
 
 ## Limitations
 
