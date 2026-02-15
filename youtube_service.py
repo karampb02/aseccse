@@ -2,8 +2,6 @@
 YouTube Service Module
 Handles all YouTube API interactions including authentication, search, and playlist creation
 """
-import os
-import pickle
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
